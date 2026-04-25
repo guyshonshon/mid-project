@@ -39,11 +39,11 @@ with open(
 
 
 def get_latest_scores():
-    if not highscore_path.exists():
-        return []
-    return [
-        int(line) for line in open(highscore_path, "r")
-    ]  # file closes after list population
+    return (
+        [int(line) for line in open(highscore_path, "r")]
+        if highscore_path.exists()
+        else []
+    )  # file closes after list population
 
 
 def best_score():
