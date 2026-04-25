@@ -22,22 +22,6 @@ def get_user_steps(index, end_of_file_index):
     return int(_input)
 
 
-# Start
-print("Hidding the treasure....")
-
-
-with open(
-    file_path, "w"
-) as file:  # w overwrites content so no need to delete pre-existing
-    for digit in range(0, 10):
-        file.write(rand_digits(digit))
-
-    file.write("TREASURE")  # appends the treasure word
-
-    for digit in range(9, -1, -1):  # reverse indexing loop
-        file.write(rand_digits(digit))
-
-
 def get_latest_scores():
     return (
         [int(line) for line in open(highscore_path, "r")]
@@ -63,7 +47,7 @@ def append_score(new_score):
     return latest_10_scores
 
 
-def get_end_of_index_of_file(file):
+def get_eof_index(file):
     """
     while we could cheaphax "len(file.read())", for best performance
     we could seek EOF, 'tell()' and reset back cursor to the beginning.
@@ -81,12 +65,28 @@ def get_end_of_index_of_file(file):
     return eof
 
 
+# Start
+print("Hidding the treasure....")
+
+
+with open(
+    file_path, "w"
+) as file:  # w overwrites content so no need to delete pre-existing
+    for digit in range(0, 10):
+        file.write(rand_digits(digit))
+
+    file.write("TREASURE")  # appends the treasure word
+
+    for digit in range(9, -1, -1):  # reverse indexing loop
+        file.write(rand_digits(digit))
+
+
 # STEP 2:
 with open(file_path, "r") as file:
     index = 0
     user_steps = 0
     moves = 0
-    max_index = get_end_of_index_of_file(file)
+    max_index = get_eof_index(file)
 
     print(
         f"Your best score is {best_score()} moves\nThe treasure may be found within {max_index} steps"
@@ -109,17 +109,15 @@ with open(file_path, "r") as file:
             index -= user_steps
 
         file.seek(index)
-        char_at_cursor = file.read(1)
+        index_char = file.read(1)
 
-        if char_at_cursor in "TREASURE":
+        if index_char in "TREASURE":
             print("#" * 50)
-            print(f"You found '{char_at_cursor}' in {moves} attempts.")
+            print(f"You found the treasure '{index_char}' in {moves} attempts.")
             print("#" * 50)
             append_score(moves)
             break
         else:
-            print(
-                f"Not here... that was {char_at_cursor}! Try again! ({moves=}, {index=})"
-            )
+            print(f"Not here... that was {index_char}! Try again! ({moves=}, {index=})")
 
         print("-" * 50)  # separator for ease of reading
