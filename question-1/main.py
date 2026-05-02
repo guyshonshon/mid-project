@@ -3,16 +3,22 @@ import random
 import os
 from pathlib import Path
 
-file_path = Path("file.txt")
-highscore_path = Path("highscore.txt")  # least moves each line, sorted
+TREASURE_PATH = Path("treasure.txt")
+HIGHSCORES_PATH = Path("highscore.txt")  # least moves each line, sorted
 
 
 # Utility function for redundancy (DRY)
 def rand_digits(digit):
+    """
+    Return 'digit' multiplied by 1-20 times randomly
+    """
     return str(digit) * random.randrange(1, 21)
 
 
 def get_user_steps(index, end_of_file_index):
+    """
+    Utility function to let user insert steps
+    """
     _input = input("How many characters? ")
 
     assert (
@@ -23,11 +29,19 @@ def get_user_steps(index, end_of_file_index):
 
 
 def get_latest_scores():
-    return (
-        [int(line) for line in open(highscore_path, "r")]
-        if highscore_path.exists()
-        else []
-    )  # file closes after list population
+    """
+    Iterates through 'HIGHSCORES_PATH', attempts to read it's content
+    in read mode ('r') and return a list of ints per line.
+    
+    We assure that the flie only ever writes ints, so it's safe
+    to assume int(line) casting works.
+    """
+    try:
+        with HIGHSCORES_PATH.open("r") as file:
+            return [int(line) for line in file]
+
+    except (FileNotFoundError, PermissionError):
+        return []
 
 
 def best_score():
@@ -36,22 +50,45 @@ def best_score():
 
 
 def append_score(new_score):
+    """
+    Fetches latest scores, add {new_score} to the list and sort,
+    then, slice the first 10 entries and write them to the {HIGHSCORES_FILE}
+    and return the new list.
+    """
     latest_scores = get_latest_scores()
     latest_scores.append(new_score)
     latest_scores.sort()
 
     latest_10_scores = latest_scores[:10]
-    with open(highscore_path, "w") as file:
-        file.writelines(f"{score}\n" for score in latest_10_scores)
+    write_highscores(latest_10_scores)
 
     return latest_10_scores
 
+
+def write_highscores(scores):
+    """
+    Attempts to write scores to highscores file.
+    Safely casts int for score to ensure type-safety of file,
+    otherwise, an error occurs. 
+    """
+    try:
+        with open(HIGHSCORES_PATH, "w") as file:
+            file.writelines(f"{int(score)}\n" for score in scores)
+    except FileNotFoundError:
+        print(f"{HIGHSCORES_PATH} doesn't exists")
+    except PermissionError:
+        print('Permission denied for file')
+    except ValueError:
+        print(f'{scores=} contains a non-digit entry')
+    
 
 def get_eof_index(file):
     """
     while we could cheaphax "len(file.read())", for best performance
     we could seek EOF, 'tell()' and reset back cursor to the beginning.
 
+    os.SEEK_END docs:
+    
     #seek(offset, whence)
     whence (optional): Defines the reference point for the offset.
         0 (or os.SEEK_SET): Beginning of the file (Default). The offset must be
@@ -70,7 +107,7 @@ print("Hidding the treasure....")
 
 
 with open(
-    file_path, "w"
+    TREASURE_PATH, "w"
 ) as file:  # w overwrites content so no need to delete pre-existing
     for digit in range(0, 10):
         file.write(rand_digits(digit))
@@ -81,8 +118,10 @@ with open(
         file.write(rand_digits(digit))
 
 
+BACKWARD_STEP = 1
+FORWARD_STEP = 2
 # STEP 2:
-with open(file_path, "r") as file:
+with open(TREASURE_PATH, "r") as file:
     index = 0
     user_steps = 0
     moves = 0
@@ -96,13 +135,13 @@ with open(file_path, "r") as file:
         moves += 1
         user_steps = get_user_steps(index, max_index)
 
-        if direction == 1:  # backward
+        if direction == BACKWARD_STEP:
             if index + user_steps > max_index:
                 print(f"You went too far! You can go up to {max_index - index} steps")
                 continue  # let user enter input again
             index += user_steps
 
-        elif direction == 2:  # forward
+        elif direction == FORWARD_STEP:
             if index - user_steps < 0:
                 print(f"Too many steps, you can travel back up to {index} steps")
                 continue
