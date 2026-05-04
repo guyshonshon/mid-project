@@ -1,14 +1,6 @@
 import os
 
 
-def get_normalized_file_name(file_name):
-    """
-    Return the normalized file-path for a given file-name
-    """
-    return f'./{file_name}'
-
-
-
 def GetSumSize(files):
     """
     Return the sum of files in bytes.
@@ -24,14 +16,12 @@ def GetSumSize(files):
     """
     sum = 0
     for file in files:
-        normalized_file_name = get_normalized_file_name(file)
         try: 
-            if os.path.exists(normalized_file_name):
-                sum += os.path.getsize(normalized_file_name)
+            sum += os.path.getsize(file)
         except FileNotFoundError:
-            print(f'{normalized_file_name} does not exist')
+            print(f'{file} does not exist')
         except PermissionError:
-            print(f'Permission denied for {normalized_file_name}')
+            print(f'Permission denied for {file}')
     return sum
 
 
