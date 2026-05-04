@@ -1,12 +1,6 @@
 import random
 import json
 
-def get_normalized_file_name(file_name):
-    """
-    Return the normalized file-path for a given file-name
-    """
-    return f"./{file_name}"
-
 
 def generate_random_numbers(n):
     """
@@ -20,7 +14,7 @@ def get_avg(nums):
     Return the average of nums with no reminder
     """
 
-    return int(sum(nums) / len(nums))
+    return sum(nums) / len(nums)
 
 
 def get_standard_deviation(average, nums):
@@ -85,9 +79,11 @@ def get_modes(nums):
 
 
 def GenerateRandomNumbersFile(file_name, n):
-    normalized_file_name = get_normalized_file_name(file_name)
     try:
-        with open(normalized_file_name, "w+") as file:
+        with open(file_name, "w+") as file:
+            if n <= 0:
+                print("n must be greater than 0")
+                return
             nums = generate_random_numbers(n)
             average = get_avg(nums)
             standard_deviation = get_standard_deviation(average, nums)
@@ -106,9 +102,9 @@ def GenerateRandomNumbersFile(file_name, n):
                 }, indent=4
             ))
     except FileNotFoundError:
-        print(f"{normalized_file_name} does not exist")
+        print(f"{file_name} does not exist")
     except PermissionError:
-        print(f"Permission denied for {normalized_file_name}")
+        print(f"Permission denied for {file_name}")
 
 
 if __name__ == "__main__":
