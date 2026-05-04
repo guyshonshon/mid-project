@@ -1,11 +1,5 @@
 PATTERN = "1234"
 
-def get_normalized_file_name(file_name):
-    """
-    Return the normalized file-path for a given file-name
-    """
-    return f'./{file_name}'
-
 
 def get_pattern_occurrences_with_slicing(content, pattern):
     """
@@ -80,10 +74,8 @@ def FindPatternWithoutBuiltins(file_name):
     Open input and output file with corresponding modes,
     Then read input's content, reverse it and write to output.
     """
-    normalized_file_name = get_normalized_file_name(file_name)
-
     try:
-        with open(normalized_file_name, 'r') as file:
+        with open(file_name, 'r') as file:
             content = file.read()
             occurrences = get_pattern_occurrences_with_slicing(content, PATTERN)
             hardcoded_occurrences = get_pattern_occurrences_with_indexing_nested_loop(content, PATTERN)
@@ -94,9 +86,9 @@ def FindPatternWithoutBuiltins(file_name):
             print(hardcoded_occurrences)
 
     except FileNotFoundError:
-        print(f'{normalized_file_name} does not exist')
+        print(f'{file_name} does not exist')
     except PermissionError:
-        print(f'Permission denied for {normalized_file_name}')
+        print(f'Permission denied for {file_name}')
 
 
 if __name__ == '__main__':
