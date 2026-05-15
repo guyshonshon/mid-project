@@ -156,7 +156,6 @@ def start_game():
                 print("You may only use 1-forward or 2-backwards as a direction.")
                 continue
 
-            moves += 1
             user_steps = get_user_steps(index, max_index)
 
             if direction == FORWARD_STEP:
@@ -178,6 +177,7 @@ def start_game():
             
             file.seek(index)
             index_char = file.read(1)
+            moves += 1
 
             if index_char in "TREASURE":
                 print("#" * 50)
